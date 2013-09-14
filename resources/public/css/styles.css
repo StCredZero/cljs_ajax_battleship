@@ -152,9 +152,10 @@ input[type=radio]:checked + label{ background-position: 0 -112px; }
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
 	margin: 45px;
-	/*width: 480px;*/
 	text-align: center;
+	padding:0;
 	border-collapse: collapse;
+    border-spacing: 0;
 }
 #rounded-corner thead th.rounded-ul-corner
 {
@@ -172,15 +173,24 @@ input[type=radio]:checked + label{ background-position: 0 -112px; }
 	color: #039;
 	background: #A9F2F7;
 }
+table tr {
+    border: 0px 0px 0px 0px;
+}
+img {
+	display: block;
+	border: 0;
+}
 #rounded-corner td
 {
 	padding: 0px;
 	width: 28px;
 	height: 28px;
-	/*background: #e8edff url('/table-images/cell3.png') right -1px no-repeat;*/
 	background: #A9F2F7;
-	border-top: 0px solid #b9c9fe;
-	border-left: 0px solid #b9c9fe;
+	border: none;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	margin-top: 0px;
+	margin-bottom: 0px;
 	color: #669;
 }
 #rounded-corner tbody td.rounded-rowlabel

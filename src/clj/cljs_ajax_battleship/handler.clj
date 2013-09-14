@@ -25,6 +25,18 @@
          "<input type='submit' value='Submit'>"
          "</form>")))
 
+(defn create-ship-index-f [player]
+  (fn [c0]
+    (let [ship-at (fn [c1] (get (:ships player) c1))]
+      (if (nil? (ship-at c0))
+        0
+        (let [not-same-ship-type? (fn [c1] (not (= (ship-at c0) (ship-at c1))))
+              count-up   (count (bship/coords-until not-same-ship-type? bship/offset-up c0))
+              count-down (count (bship/coords-until not-same-ship-type? bship/offset-down c0))
+              count-left (count (bship/coords-until not-same-ship-type? bship/offset-left c0))
+              direction  (if (> (+ count-down count-up) 2) "v" "h")]
+          (str direction (max count-up count-left)))))))
+
 (defn battleship-table-cell [id-prefix render-f coord]
   (str "<td id=\"" id-prefix coord "\">" (render-f coord) "</td>"))
 
@@ -70,7 +82,8 @@
 (defn create-hit-display-f [player1 player2]
   (fn [coord]
     (let [player-map   (merge (:ships player1) (:impacts player1))
-          coord-status (get player-map coord)]
+          coord-status (get player-map coord)
+          ship-index   (create-ship-index-f player1)]
       (if (nil? coord-status)
         (str "<img src=\"/table-images/bs-back5.png\">")
         (if (= coord-status "hit")
@@ -80,7 +93,7 @@
             (let [disp-letter (get bship/ship-display-map coord-status)]
               (if (nil? disp-letter)
                 "ERR"
-                disp-letter))))))))
+                (str "<img src=\"/table-images/" disp-letter (ship-index coord) ".png\">")))))))))
 
 (defn create-shot-display-f [player1 player2]
   (fn [coord]
@@ -106,6 +119,7 @@
       <body>"
      (battleship-table "Targeting" "targeting" shot-display-f)
      (battleship-table "Fleet Status" "status" hit-display-f)
+     "<script src=\"/js/cljs_ajax_battleship_dbg.js\"></script>"
      "</body>
       </html>")))
 
