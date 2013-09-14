@@ -17,7 +17,7 @@
         player-string2 (bship/player->string player2)]
     (str "<pre>"
          (with-out-str (bship/raw-print-side player1 player2))
-         " </pre>"
+         "</pre>"
          "<form action='/bs' method='get'>"
          "<input type='hidden' name='p1' value='" player-string1 "'>"
          "<input type='hidden' name='p2' value='" player-string2 "'>"
@@ -26,29 +26,21 @@
          "</form>")))
 
 (defn battleship-table-cell [grid-map render-map relative-url coord]
-  (str "<td><a href=\""
-       relative-url
-       coord
-       "\">"
-       coord
-       "</a></td>"))
+  (str "<td><a href=\"" relative-url coord "\">" coord "</a></td>"))
 
 (defn battleship-table-row [grid-map render-map relative-url row]
-  (str "<tr><td class=\"rounded-rowlabel\">"
-       row
-       "</td>"
-       (apply str (for [col bship/cols]
-                    (let [coord (str row col)]
-                      (battleship-table-cell grid-map render-map relative-url coord))))
+  (str "<tr>"
+       "<td class=\"rounded-rowlabel\">" row "</td>"
+       (apply str
+              (for [col bship/cols]
+                (let [coord (str row col)]
+                  (battleship-table-cell grid-map render-map relative-url coord))))
        "</tr>"))
 
 (defn battleship-table-header []
-  (apply str (for [col bship/cols]
-               (str "<th scope=\"col\" class=\"rounded-col"
-                    col
-                    "\">"
-                    col
-                    "</th>"))))
+  (apply str
+         (for [col bship/cols]
+           (str "<th scope=\"col\" class=\"rounded-col" col "\">" col "</th>"))))
 
 (defn battleship-table [grid-map render-map relative-url]
   (str "<table id=\"rounded-corner\" summary=\"Battleship\">
@@ -73,11 +65,7 @@
 (defn ajbs-html [player1 player2]
   (let [player-string1 (bship/player->string player1)
         player-string2 (bship/player->string player2)
-        relative-url (str "/ajbs?p1="
-                     player-string1
-                     "&p2="
-                     player-string2
-                     "&s=")]
+        relative-url   (str "/ajbs?p1=" player-string1 "&p2=" player-string2 "&s=")]
     (str
      "<!DOCTYPE html>
       <html class=\"bs-html\" lang=\"en-US\">

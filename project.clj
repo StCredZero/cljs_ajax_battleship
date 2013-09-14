@@ -1,5 +1,5 @@
 (defproject cljs_ajax_battleship "0.1.0-SNAPSHOT"
-  :description "A project done as a learning exercise forimplementing the game Battleship in Clojure and ClojureScript."
+  :description "A project done as a learning exercise while implementing the game Battleship in Clojure and ClojureScript."
   :url "http://example.com/FIXME"
   :license {:name "BSD License"
             :url "http://opensource.org/licenses/BSD-3-Clause"}
