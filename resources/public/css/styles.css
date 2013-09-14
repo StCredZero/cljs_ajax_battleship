@@ -146,7 +146,7 @@ input[type=radio]:focus + label{ background-position: 0 -80px; }
 input[type=radio] + label:hover{ background-position: 0 -96px; } 
 input[type=radio]:checked + label{ background-position: 0 -112px; }
 */
-
+/*#A9F2F7*/
 #rounded-corner
 {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
@@ -158,19 +158,19 @@ input[type=radio]:checked + label{ background-position: 0 -112px; }
 }
 #rounded-corner thead th.rounded-ul-corner
 {
-	background: #b9c9fe url('/table-images/left.png') left -1px no-repeat;
+	background: #A9F2F7 url('/table-images/left.png') left -1px no-repeat;
 }
 #rounded-corner thead th.rounded-col10
 {
-	background: #b9c9fe url('/table-images/right.png') right -1px no-repeat;
+	background: #A9F2F7 url('/table-images/right.png') right -1px no-repeat;
 }
 #rounded-corner th
 {
 	padding: 8px;
 	font-weight: normal;
-	font-size: 13px;
+	font-size: 10px;
 	color: #039;
-	background: #b9c9fe;
+	background: #A9F2F7;
 }
 #rounded-corner td
 {
@@ -178,34 +178,34 @@ input[type=radio]:checked + label{ background-position: 0 -112px; }
 	width: 28px;
 	height: 28px;
 	/*background: #e8edff url('/table-images/cell3.png') right -1px no-repeat;*/
-	background: #e8edff;
-	border-top: 1px solid #b9c9fe;
-	border-left: 1px solid #b9c9fe;
+	background: #A9F2F7;
+	border-top: 0px solid #b9c9fe;
+	border-left: 0px solid #b9c9fe;
 	color: #669;
 }
 #rounded-corner tbody td.rounded-rowlabel
 {
-	background: #b9c9fe right -1px no-repeat;
+	background: #A9F2F7 right -1px no-repeat;
 }
 #rounded-corner tbody td.rounded-empty
 {
-	background: #b9c9fe url('/table-images/cell3.png') right -1px no-repeat;
+	background: #A9F2F7 url('/table-images/cell3.png') right -1px no-repeat;
 }
 #rounded-corner tbody td.rounded-hit
 {
-	background: #b9c9fe url('/table-images/explosion.png') right -1px no-repeat;
+	background: #A9F2F7 url('/table-images/explosion.png') right -1px no-repeat;
 }
 #rounded-corner tbody td.rounded-miss
 {
-	background: #b9c9fe url('/table-images/miss.png') right -1px no-repeat;
+	background: #A9F2F7 url('/table-images/miss.png') right -1px no-repeat;
 }
 #rounded-corner tfoot td.rounded-foot-left
 {
-	background: #b9c9fe url('/table-images/botleft.png') left bottom no-repeat;
+	background: #A9F2F7 url('/table-images/botleft.png') left bottom no-repeat;
 }
 #rounded-corner tfoot td.rounded-foot-right
 {
-	background: #b9c9fe url('/table-images/botright.png') right bottom no-repeat;
+	background: #A9F2F7 url('/table-images/botright.png') right bottom no-repeat;
 }
 #rounded-corner tbody td:hover
 {

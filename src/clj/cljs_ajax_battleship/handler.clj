@@ -25,47 +25,78 @@
          "<input type='submit' value='Submit'>"
          "</form>")))
 
-(defn battleship-table-cell [grid-map render-map relative-url coord]
-  (str "<td><a href=\"" relative-url coord "\">" coord "</a></td>"))
+(defn battleship-table-cell [id-prefix render-f coord]
+  (str "<td id=\"" id-prefix coord "\">" (render-f coord) "</td>"))
 
-(defn battleship-table-row [grid-map render-map relative-url row]
+(defn battleship-table-row [id-prefix render-f row]
   (str "<tr>"
        "<td class=\"rounded-rowlabel\">" row "</td>"
        (apply str
               (for [col bship/cols]
                 (let [coord (str row col)]
-                  (battleship-table-cell grid-map render-map relative-url coord))))
+                  (battleship-table-cell id-prefix render-f coord))))
        "</tr>"))
 
 (defn battleship-table-header []
-  (apply str
-         (for [col bship/cols]
-           (str "<th scope=\"col\" class=\"rounded-col" col "\">" col "</th>"))))
+  (str
+   "<thead><tr>"
+   "<th scope=\"col\" class=\"rounded-ul-corner\"> </th>"
+   (apply str
+          (for [col bship/cols]
+            (str "<th scope=\"col\" class=\"rounded-col" col "\">" col "</th>")))
+   "</tr></thead>"))
 
-(defn battleship-table [grid-map render-map relative-url]
-  (str "<table id=\"rounded-corner\" summary=\"Battleship\">
-       <thead>
-       <tr>
-       <th scope=\"col\" class=\"rounded-ul-corner\"> </th>"
+(defn battleship-table [table-display-name id-prefix render-f]
+  (str "<table id=\"rounded-corner\" summary=\"Battleship\">"
        (battleship-table-header)
-       "</thead>
-        <tfoot>
-        <tr>
-        <td colspan=\"10\" class=\"rounded-foot-left\">
-        <em>The above data were fictional and made up, please do not sue me</em></td>
-        <td class=\"rounded-foot-right\">&nbsp;</td>
+       "<tfoot>
+        <tr>"
+        "<td colspan=\"10\" class=\"rounded-foot-left\"><em>" table-display-name "</em></td>"
+        "<td class=\"rounded-foot-right\">&nbsp;</td>
         </tr>
-        </tfoot>
-        <tbody>"
+        </tfoot>"
+        "<tbody>"
        (apply str (for [row bship/rows]
-                    (battleship-table-row grid-map render-map relative-url row)))
+                    (battleship-table-row id-prefix render-f row)))
        "</tbody>
-        </table>"))
+        </table>"
+       ))
+
+(defn relative-get-url [player1 player2]
+  (let [player-string1 (bship/player->string player1)
+        player-string2 (bship/player->string player2)]
+    (str "/ajbs?p1=" player-string1 "&p2=" player-string2 "&s=")))
+
+(defn create-hit-display-f [player1 player2]
+  (fn [coord]
+    (let [player-map   (merge (:ships player1) (:impacts player1))
+          coord-status (get player-map coord)]
+      (if (nil? coord-status)
+        (str "<img src=\"/table-images/bs-back5.png\">")
+        (if (= coord-status "hit")
+          (str "<img src=\"/table-images/explosion2.png\">")
+          (if (= coord-status "miss")
+            (str "<img src=\"/table-images/miss2.png\">")
+            (let [disp-letter (get bship/ship-display-map coord-status)]
+              (if (nil? disp-letter)
+                "ERR"
+                disp-letter))))))))
+
+(defn create-shot-display-f [player1 player2]
+  (fn [coord]
+    (let [relative-url (relative-get-url player1 player2)
+          coord-status (get (:impacts player2) coord)]
+      (if (nil? coord-status)
+        (str "<a href=\"" relative-url coord "\"><img src=\"/table-images/bs-back5.png\"></a>")
+        (if (= coord-status "hit")
+          (str "<img src=\"/table-images/explosion2.png\">")
+          (if (= coord-status "miss")
+            (str "<img src=\"/table-images/miss2.png\">")
+            ("ERR")))))))
 
 (defn ajbs-html [player1 player2]
-  (let [player-string1 (bship/player->string player1)
-        player-string2 (bship/player->string player2)
-        relative-url   (str "/ajbs?p1=" player-string1 "&p2=" player-string2 "&s=")]
+  (let [shot-display-f (create-shot-display-f player1 player2)
+        hit-display-f  (create-hit-display-f player1 player2)]
     (str
      "<!DOCTYPE html>
       <html class=\"bs-html\" lang=\"en-US\">
@@ -73,7 +104,8 @@
       <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/styles.css\" />
       </head>
       <body>"
-     (battleship-table {} {} relative-url)
+     (battleship-table "Targeting" "targeting" shot-display-f)
+     (battleship-table "Fleet Status" "status" hit-display-f)
      "</body>
       </html>")))
 
@@ -85,7 +117,7 @@
 (defroutes my-routes
   (GET "/" []
        (let [players (bship/new-players)]
-         (battleship-html (first players) (last players))))
+         (ajbs-html (first players) (last players))))
 
   ;; serve static pages saved in resources/public directory
   (route/resources "/")
