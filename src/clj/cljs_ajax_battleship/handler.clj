@@ -111,15 +111,40 @@
   (let [shot-display-f (create-shot-display-f player1 player2)
         hit-display-f  (create-hit-display-f player1 player2)]
     (str
-     "<!DOCTYPE html>
-      <html class=\"bs-html\" lang=\"en-US\">
-      <head>
-      <link rel=\"stylesheet\" type=\"text/css\" href=\"/css/styles.css\" />
-      </head>
-      <body>"
+     "<!DOCTYPE html>"
+     "<html class=\"bs-html\" lang=\"en-US\">"
+     "<head>"
+     "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/styles.css\" />"
+     "<script src=\"http://code.jquery.com/jquery-1.9.1.js\"></script>"
+     "<script src=\"http://code.jquery.com/ui/1.10.3/jquery-ui.js\"></script>"
+     "<style>"
+     ".dragthing { width: 140px; height: 28px; padding: 0px; float: left; margin: 0px; font-size: .9em; }"
+     "</style>"
+     "</head>"
+     "<body bgcolor=#ffffff>"
+     "<div id=\"harbor\">"
+     "<div id=\"draggable1\" class=\"dragthing ui-widget-content\">"
+     "<img id=\"carrier\" src=\"/table-images/Ah.png\">"
+     "</div>"
+     "<div id=\"draggable2\" class=\"dragthing ui-widget-content\">"
+     "<img id=\"battleship\" src=\"/table-images/Bh.png\">"
+     "</div>"
+     "<div id=\"draggable3\" class=\"dragthing ui-widget-content\">"
+     "<img id=\"cruiser\" src=\"/table-images/Ch.png\">"
+     "</div>"
+     "<div id=\"draggable4\" class=\"dragthing ui-widget-content\">"
+     "<img id=\"submarine\" src=\"/table-images/Sh.png\">"
+     "</div>"
+     "<div id=\"draggable5\" class=\"dragthing ui-widget-content\">"
+     "<img id=\"destroyer\" src=\"/table-images/Dh.png\">"
+     "</div>"
+     "</div>"
+     "<hr>"
      (battleship-table "Targeting" "targeting" shot-display-f)
      (battleship-table "Fleet Status" "status" hit-display-f)
      "<script src=\"/js/cljs_ajax_battleship_dbg.js\"></script>"
+     "<script>cljs_ajax_battleship.fleet.init();</script>"
+
      "</body>
       </html>")))
 

@@ -151,7 +151,7 @@ input[type=radio]:checked + label{ background-position: 0 -112px; }
 {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
-	margin: 45px;
+	margin: 0px;
 	text-align: center;
 	padding:0;
 	border-collapse: collapse;

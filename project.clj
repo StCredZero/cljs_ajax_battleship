@@ -8,6 +8,7 @@
   :source-paths ["src/clj"]
 
   :dependencies [[org.clojure/clojure "1.5.1"]
+                 [jayq "2.4.0"]
                  [cheshire "5.2.0"]
                  [compojure "1.1.5"]
                  [domina "1.0.2-SNAPSHOT"]
