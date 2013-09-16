@@ -40,8 +40,18 @@
          (>= y top)
          (<= y bottom))))
 
+(defn singleton-string-seq [a-string]
+  (map str (seq a-string)))
+
+;; (set (map str (seq a-string))) returns same under ClojureScript and Clojure
+(defn singleton-string-set [a-string]
+  (set (map str (seq a-string))))
+
+(defn number-set []
+  (singleton-string-set "0123456789"))
+
 (defn coord-from-id [id-str]
-  (let [coord-chars    (set (map str (seq "ABCDEFGHIJ0123456789")))
+  (let [coord-chars    (singleton-string-set "ABCDEFGHIJ0123456789")
         is-coord-char? (fn [c] (contains? coord-chars c))]
     (apply str (filter is-coord-char? id-str))))
 
@@ -68,14 +78,12 @@
         covered-ids    (map (fn [x] (coord-of-elem x)) covered)]
     (map (fn [x] (coord-of-elem x)) covered)))
 
-(def number-set (set (seq "0123456789")))
-
 (defn ship-type [id-str]
-  (let [not-number? (fn [c] (not (contains? number-set c)))]
+  (let [not-number? (fn [c] (not (contains? (number-set) c)))]
     (apply str (filter not-number? id-str))))
 
 (defn counterpart-id [id-str]
-  (let [suffix      (apply str (filter number-set (seq id-str)))
+  (let [suffix      (apply str (filter (number-set) (seq id-str)))
         inverted    (mod (+ 1 (js/parseInt suffix)) 2)]
     (str (ship-type id-str) inverted)))
 

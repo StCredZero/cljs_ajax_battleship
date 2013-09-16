@@ -36452,8 +36452,14 @@ cljs_ajax_battleship.fleet.contains_pt_QMARK_ = function contains_pt_QMARK_(elem
     return and__3941__auto__
   }
 };
+cljs_ajax_battleship.fleet.singleton_string_set = function singleton_string_set(a_string) {
+  return cljs.core.set.call(null, cljs.core.map.call(null, cljs.core.str, cljs.core.seq.call(null, a_string)))
+};
+cljs_ajax_battleship.fleet.number_set = function number_set() {
+  return cljs_ajax_battleship.fleet.singleton_string_set.call(null, "0123456789")
+};
 cljs_ajax_battleship.fleet.coord_from_id = function coord_from_id(id_str) {
-  var coord_chars = cljs.core.set.call(null, cljs.core.map.call(null, cljs.core.str, cljs.core.seq.call(null, "ABCDEFGHIJ0123456789")));
+  var coord_chars = cljs_ajax_battleship.fleet.singleton_string_set.call(null, "ABCDEFGHIJ0123456789");
   var is_coord_char_QMARK_ = function(coord_chars) {
     return function(c) {
       return cljs.core.contains_QMARK_.call(null, coord_chars, c)
@@ -36493,15 +36499,14 @@ cljs_ajax_battleship.fleet.covered_coords = function covered_coords(ship) {
     return cljs_ajax_battleship.fleet.coord_of_elem.call(null, x)
   }, covered)
 };
-cljs_ajax_battleship.fleet.number_set = cljs.core.set.call(null, cljs.core.seq.call(null, "0123456789"));
 cljs_ajax_battleship.fleet.ship_type = function ship_type(id_str) {
   var not_number_QMARK_ = function(c) {
-    return!cljs.core.contains_QMARK_.call(null, cljs_ajax_battleship.fleet.number_set, c)
+    return!cljs.core.contains_QMARK_.call(null, cljs_ajax_battleship.fleet.number_set.call(null), c)
   };
   return cljs.core.apply.call(null, cljs.core.str, cljs.core.filter.call(null, not_number_QMARK_, id_str))
 };
 cljs_ajax_battleship.fleet.counterpart_id = function counterpart_id(id_str) {
-  var suffix = cljs.core.apply.call(null, cljs.core.str, cljs.core.filter.call(null, cljs_ajax_battleship.fleet.number_set, cljs.core.seq.call(null, id_str)));
+  var suffix = cljs.core.apply.call(null, cljs.core.str, cljs.core.filter.call(null, cljs_ajax_battleship.fleet.number_set.call(null), cljs.core.seq.call(null, id_str)));
   var inverted = cljs.core.mod.call(null, 1 + parseInt(suffix), 2);
   return[cljs.core.str(cljs_ajax_battleship.fleet.ship_type.call(null, id_str)), cljs.core.str(inverted)].join("")
 };
