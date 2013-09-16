@@ -59,7 +59,7 @@
    "</tr></thead>"))
 
 (defn battleship-table [table-display-name id-prefix render-f]
-  (str "<table id=\"rounded-corner\" summary=\"Battleship\">"
+  (str "<table id=\""id-prefix "\" summary=\"Battleship\">"
        (battleship-table-header)
        "<tfoot>
         <tr>"
@@ -79,13 +79,16 @@
         player-string2 (bship/player->string player2)]
     (str "/ajbs?p1=" player-string1 "&p2=" player-string2 "&s=")))
 
+(defn empty-display-f [coord]
+  (str "<img src=\"/table-images/bs-back5.png\">"))
+
 (defn create-hit-display-f [player1 player2]
   (fn [coord]
     (let [player-map   (merge (:ships player1) (:impacts player1))
           coord-status (get player-map coord)
           ship-index   (create-ship-index-f player1)]
       (if (nil? coord-status)
-        (str "<img src=\"/table-images/bs-back5.png\">")
+        (empty-display-f coord)
         (if (= coord-status "hit")
           (str "<img src=\"/table-images/explosion2.png\">")
           (if (= coord-status "miss")
@@ -117,37 +120,66 @@
      "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/styles.css\" />"
      "<script src=\"http://code.jquery.com/jquery-1.9.1.js\"></script>"
      "<script src=\"http://code.jquery.com/ui/1.10.3/jquery-ui.js\"></script>"
-     "<style>"
-     ".dragthing { width: 140px; height: 28px; padding: 0px; float: left; margin: 0px; font-size: .9em; }"
-     "</style>"
      "</head>"
      "<body bgcolor=#ffffff>"
-     "<div id=\"harbor\">"
-     "<div id=\"draggable1\" class=\"dragthing ui-widget-content\">"
-     "<img id=\"carrier\" src=\"/table-images/Ah.png\">"
-     "</div>"
-     "<div id=\"draggable2\" class=\"dragthing ui-widget-content\">"
-     "<img id=\"battleship\" src=\"/table-images/Bh.png\">"
-     "</div>"
-     "<div id=\"draggable3\" class=\"dragthing ui-widget-content\">"
-     "<img id=\"cruiser\" src=\"/table-images/Ch.png\">"
-     "</div>"
-     "<div id=\"draggable4\" class=\"dragthing ui-widget-content\">"
-     "<img id=\"submarine\" src=\"/table-images/Sh.png\">"
-     "</div>"
-     "<div id=\"draggable5\" class=\"dragthing ui-widget-content\">"
-     "<img id=\"destroyer\" src=\"/table-images/Dh.png\">"
-     "</div>"
-     "</div>"
-     "<hr>"
      (battleship-table "Targeting" "targeting" shot-display-f)
      (battleship-table "Fleet Status" "status" hit-display-f)
      "<script src=\"/js/cljs_ajax_battleship_dbg.js\"></script>"
-     "<script>cljs_ajax_battleship.fleet.init();</script>"
-
+     "<script>"
+     "$( document ).ready(function() {"
+     "console.log( \"document loaded\" ); "
+     "});"
+     "$(window).load(function(){"
+     "cljs_ajax_battleship.fleet.init();"
+     "console.log( \"initialized\" ); "
+     "});"
+     "</script>"
      "</body>
       </html>")))
 
+(defn deploy-html [player1 player2]
+  (let [shot-display-f (create-shot-display-f player1 player2)
+        hit-display-f  (create-hit-display-f player1 player2)]
+    (str
+     "<!DOCTYPE html>"
+     "<html class=\"bs-html\" lang=\"en-US\">"
+     "<head>"
+     "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/styles.css\" />"
+     "<script src=\"http://code.jquery.com/jquery-1.9.1.js\"></script>"
+     "<script src=\"http://code.jquery.com/ui/1.10.3/jquery-ui.js\"></script>"
+     "</head>"
+     "<body bgcolor=#ffffff>"
+     (battleship-table "Fleet Deployment" "deploy" empty-display-f)
+     "<img id=\"harbor-image\" src=\"/table-images/harbor1.png\" >"
+     "<div id=\"harbor\" >"
+     "<div id=\"carrier1\"    class=\"dragthing\"><img id=\"carrier1i\"    src=\"/table-images/Ah.png\"></div>"
+     "<div id=\"battleship1\" class=\"dragthing\"><img id=\"battleship1i\" src=\"/table-images/Bh.png\"></div>"
+     "<div id=\"cruiser1\"    class=\"dragthing\"><img id=\"cruiser1i\"    src=\"/table-images/Ch.png\"></div>"
+     "<div id=\"submarine1\"  class=\"dragthing\"><img id=\"submarine1i\"  src=\"/table-images/Sh.png\"></div>"
+     "<div id=\"destroyer1\"  class=\"dragthing\"><img id=\"destroyer1i\"  src=\"/table-images/Dh.png\"></div>"
+     "<div id=\"carrier0\"    class=\"dragthing\"><img id=\"carrier0i\"    src=\"/table-images/Av.png\"></div>"
+     "<div id=\"battleship0\" class=\"dragthing\"><img id=\"battleship0i\" src=\"/table-images/Bv.png\"></div>"
+     "<div id=\"cruiser0\"    class=\"dragthing\"><img id=\"cruiser0i\"    src=\"/table-images/Cv.png\"></div>"
+     "<div id=\"submarine0\"  class=\"dragthing\"><img id=\"submarine0i\"  src=\"/table-images/Sv.png\"></div>"
+     "<div id=\"destroyer0\"  class=\"dragthing\"><img id=\"destroyer0i\"  src=\"/table-images/Dv.png\"></div>"
+     "</div>"
+     "<form id='startgame' action='/startgame' method='GET'>"
+         "<input id='shipdata' type='hidden' name='p1' value=''>"
+         "<input type='submit' value='Start Game'>"
+     "</form>"
+     "<script src=\"/js/cljs_ajax_battleship_dbg.js\"></script>"
+     "<script>"
+     ;; "cljs_ajax_battleship.fleet.init();"
+     ;; "$( document ).ready(function() {"
+     ;; "console.log( \"document loaded\" ); "
+     ;; "});"
+     "$(window).load(function(){"
+     "cljs_ajax_battleship.fleet.init();"
+     "console.log( \"initialized\" ); "
+     "});"
+     "</script>"
+     "</body>
+      </html>")))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -156,7 +188,7 @@
 (defroutes my-routes
   (GET "/" []
        (let [players (bship/new-players)]
-         (ajbs-html (first players) (last players))))
+         (deploy-html (first players) (last players))))
 
   ;; serve static pages saved in resources/public directory
   (route/resources "/")
@@ -195,7 +227,9 @@
                       calced-shot    (bship/calc-next-shot player2 player1)
                       new-player1    (bship/raw-shoot-at player1 calced-shot)
                       new-player2    (bship/raw-shoot-at player2 canonical-shot)]
-                (ajbs-html new-player1 new-player2)))))))
+                 (ajbs-html new-player1 new-player2)))))))
+
+  (GET "/startgame*"  {params :query-params} (str params))
   
   (GET "/hi*" {params :query-params}
        (str params))

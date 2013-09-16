@@ -1,10 +1,112 @@
+#deploy {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+#targeting {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+}
+#status {
+	position: absolute;
+	left: 0px;
+	top: 364px;
+}
+#harbor-image {
+	position: absolute;
+	left: 336px;
+	top: 0px;
+	width: 530px;
+}
+#harbor {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 866px;
+}
+#carrier1 {
+	position: absolute;
+	left: 364px;
+	top: 56px;
+	height: 28px;
+}    
+#battleship1 {
+	position: absolute;
+	left: 364px;
+	top: 84px;
+	height: 28px;
+} 
+#cruiser1 {
+	position: absolute;
+	left: 364px;
+	top: 112px;
+	height: 28px;
+}    
+#submarine1 {
+	position: absolute;
+	left: 364px;
+	top: 140px;
+	height: 28px;
+}  
+#destroyer1 {
+	position: absolute;
+	left: 364px;
+	top: 168px;
+	height: 28px;
+}  
+#carrier0 {
+	position: absolute;
+	left: 616px;
+	top: 56px;
+	width: 28px;
+}    
+#battleship0 {
+	position: absolute;
+	left: 588px;
+	top: 56px;
+	width: 28px;
+} 
+#cruiser0 {
+	position: absolute;
+	left: 560px;
+	top: 56px;
+	width: 28px;
+}    
+#submarine0 {
+	position: absolute;
+	left: 532px;
+	top: 56px;
+	width: 28px;
+}  
+#destroyer0 {
+	position: absolute;
+	left: 504px;
+	top: 56px;
+	width: 28px;
+}  
+
+.dragthing { 
+	padding: 0px; 
+	float: left; 
+	margin: 0px; 
+	/*font-size: .9em; */
+}
+
+#startgame {
+	position: absolute;
+	left: 0px;
+	top: 350px;
+	width: 280px;
+}
+
 /* From: http://www.assemblesoft.com/examples/form/simpleform.html */
 * {margin:0; padding:0;}
 
 html {
 	font: 90%/1.3 arial,sans-serif;
 	padding:1em;
-	background:#B9C2CC;
+	background:#fff;
 }
 form {
 	background:#fff;
@@ -128,26 +230,9 @@ input.default {
 .error {
 	color: #FF1400;
 }
-/*
-:invalid {
-	color:red;
-}
-*/
-/*
-input[type=checkbox], input[type=radio] { visibility: hidden; width:0; height:0; padding:0; margin:0; }
-input[type=checkbox] + label, input[type=radio] + label { padding-left:18px; }
-input[type=checkbox] + label{ background: url(../gfx/check_radio.png) 0 0 no-repeat; }
-input[type=checkbox]:focus + label{ background-position: 0 -16px; }
-input[type=checkbox] + label:hover{ background-position: 0 -32px; } 
-input[type=checkbox]:checked + label{ background-position: 0 -48px; }
 
-input[type=radio] + label{ background: url(../gfx/check_radio.png) 0 -64px no-repeat; }
-input[type=radio]:focus + label{ background-position: 0 -80px; }
-input[type=radio] + label:hover{ background-position: 0 -96px; } 
-input[type=radio]:checked + label{ background-position: 0 -112px; }
-*/
 /*#A9F2F7*/
-#rounded-corner
+table
 {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
 	font-size: 12px;
@@ -157,15 +242,15 @@ input[type=radio]:checked + label{ background-position: 0 -112px; }
 	border-collapse: collapse;
     border-spacing: 0;
 }
-#rounded-corner thead th.rounded-ul-corner
+table thead th.rounded-ul-corner
 {
 	background: #A9F2F7 url('/table-images/left.png') left -1px no-repeat;
 }
-#rounded-corner thead th.rounded-col10
+table thead th.rounded-col10
 {
 	background: #A9F2F7 url('/table-images/right.png') right -1px no-repeat;
 }
-#rounded-corner th
+table th
 {
 	padding: 8px;
 	font-weight: normal;
@@ -180,7 +265,7 @@ img {
 	display: block;
 	border: 0;
 }
-#rounded-corner td
+table td
 {
 	padding: 0px;
 	width: 28px;
@@ -193,31 +278,20 @@ img {
 	margin-bottom: 0px;
 	color: #669;
 }
-#rounded-corner tbody td.rounded-rowlabel
+table tbody td.rounded-rowlabel
 {
 	background: #A9F2F7 right -1px no-repeat;
 }
-#rounded-corner tbody td.rounded-empty
-{
-	background: #A9F2F7 url('/table-images/cell3.png') right -1px no-repeat;
-}
-#rounded-corner tbody td.rounded-hit
-{
-	background: #A9F2F7 url('/table-images/explosion.png') right -1px no-repeat;
-}
-#rounded-corner tbody td.rounded-miss
-{
-	background: #A9F2F7 url('/table-images/miss.png') right -1px no-repeat;
-}
-#rounded-corner tfoot td.rounded-foot-left
+
+table tfoot td.rounded-foot-left
 {
 	background: #A9F2F7 url('/table-images/botleft.png') left bottom no-repeat;
 }
-#rounded-corner tfoot td.rounded-foot-right
+table tfoot td.rounded-foot-right
 {
 	background: #A9F2F7 url('/table-images/botright.png') right bottom no-repeat;
 }
-#rounded-corner tbody td:hover
+table tbody td:hover
 {
 	background: #d0dafd;
 }
