@@ -120,9 +120,13 @@
   (.val ($ "#shipdata") (str ship-map)))
 
 (defn start-ship-drag [event ui]
-  (let [mytarget (.-target event)
-        my-id    (.-id mytarget)]
+  (let [mytarget     (.-target event)
+        my-id        (.-id mytarget)
+        other-id     (counterpart-id my-id)
+        other-ship   ($ (str "#" other-id))
+        other-coords (covered-coords other-ship)]
     (do
+      (apply swap! (concat [ship-map dissoc] other-coords))
       (return-to-origin (counterpart-id my-id)))))
 
 (defn drag-ship [event ui] nil)
@@ -134,7 +138,9 @@
         is-empty-coord? (fn [c0] (not (contains? (deref ship-map) c0)))]
     (do
       (if (not (every? is-empty-coord? coords))
-        (return-to-last-pos my-id)
+        (do
+          (js/console.log (str "was not empty:" coords))
+          (return-to-last-pos my-id))
         (do (swap! last-pos get-current-ship-positions) 
             (swap! ship-map calc-ship-map)
             (write-ship-map (deref ship-map)))))))

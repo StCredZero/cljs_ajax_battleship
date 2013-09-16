@@ -36452,6 +36452,9 @@ cljs_ajax_battleship.fleet.contains_pt_QMARK_ = function contains_pt_QMARK_(elem
     return and__3941__auto__
   }
 };
+cljs_ajax_battleship.fleet.singleton_string_seq = function singleton_string_seq(a_string) {
+  return cljs.core.map.call(null, cljs.core.str, cljs.core.seq.call(null, a_string))
+};
 cljs_ajax_battleship.fleet.singleton_string_set = function singleton_string_set(a_string) {
   return cljs.core.set.call(null, cljs.core.map.call(null, cljs.core.str, cljs.core.seq.call(null, a_string)))
 };
@@ -36648,6 +36651,10 @@ cljs_ajax_battleship.fleet.write_ship_map = function write_ship_map(ship_map) {
 cljs_ajax_battleship.fleet.start_ship_drag = function start_ship_drag(event, ui) {
   var mytarget = event.target;
   var my_id = mytarget.id;
+  var other_id = cljs_ajax_battleship.fleet.counterpart_id.call(null, my_id);
+  var other_ship = jayq.core.$.call(null, [cljs.core.str("#"), cljs.core.str(other_id)].join(""));
+  var other_coords = cljs_ajax_battleship.fleet.covered_coords.call(null, other_ship);
+  cljs.core.apply.call(null, cljs.core.swap_BANG_, cljs.core.concat.call(null, cljs.core.PersistentVector.fromArray([cljs_ajax_battleship.fleet.ship_map, cljs.core.dissoc], true), other_coords));
   return cljs_ajax_battleship.fleet.return_to_origin.call(null, cljs_ajax_battleship.fleet.counterpart_id.call(null, my_id))
 };
 cljs_ajax_battleship.fleet.drag_ship = function drag_ship(event, ui) {
@@ -36663,6 +36670,7 @@ cljs_ajax_battleship.fleet.stop_ship_drag = function stop_ship_drag(event, ui) {
     }
   }(mytarget, my_id, coords);
   if(!cljs.core.every_QMARK_.call(null, is_empty_coord_QMARK_, coords)) {
+    console.log([cljs.core.str("was not empty:"), cljs.core.str(coords)].join(""));
     return cljs_ajax_battleship.fleet.return_to_last_pos.call(null, my_id)
   }else {
     cljs.core.swap_BANG_.call(null, cljs_ajax_battleship.fleet.last_pos, cljs_ajax_battleship.fleet.get_current_ship_positions);
