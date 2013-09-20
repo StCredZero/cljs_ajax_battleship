@@ -165,3 +165,9 @@
   (repl/connect "http://localhost:9000/repl"))
 
 (set! (.-nrepl js/window) nrepl)
+
+(defn log [& params]
+  (println params)
+  (.log js/console (clj->js params)))
+
+(log "boo" 9)

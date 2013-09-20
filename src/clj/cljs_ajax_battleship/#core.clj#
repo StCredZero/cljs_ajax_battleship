@@ -14,21 +14,6 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Definitions
-
-(def show-calc false)
-
-(def rows "ABCDEFGHIJ")
-(def cols (range 1 11))
-
-(defn abs [x] (if (neg? x) (- x) x))
-(defn rand-shipnum [] (+ (rand-int 100) (* 128 (rand-int 2))))
-
-(defstruct player-state-struct
-  :impacts
-  :ships)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Definitions - Coordinates
 
 
