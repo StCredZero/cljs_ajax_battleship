@@ -11,8 +11,7 @@
       (rand-ship ship-type))))
 
 (defn rand-ships []
-  (let [ships (apply conj (map rand-ship ship-types))]
-    (println (count ships))
+  (let [ships (apply conj (map rand-ship serialization/ship-types))]
     (if (= serialization/start-ship-count (count ships))
       ships
       (rand-ships))))
