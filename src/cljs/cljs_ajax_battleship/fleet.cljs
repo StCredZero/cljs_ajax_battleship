@@ -1,12 +1,9 @@
-(ns cljs_ajax_battleship.fleet                  ;; (in-ns 'cljs_ajax_battleship.fleet)
-  (:require-macros [hiccups.core :as h])
-  (:require [clojure.browser.repl :as repl]
-            [jayq.core :as jq]
-            [domina :as dom]
-            [hiccups.runtime :as hiccupsrt]
-            [domina.events :as ev]
-            [shoreleave.remotes.http-rpc :refer [remote-callback]]
-            [cljs.reader :refer [read-string]])
+(ns cljs_ajax_battleship.fleet
+  (:require [cljs_ajax_battleship.board :as board]
+            [cljs_ajax_battleship.serialization :as serialization]
+            [clojure.browser.repl :as repl]
+            [goog.uri :as uri]
+            [goog.uri.QueryData :as qd])
   (:use [jayq.core :only [$]]))
 
 (def original-pos (atom {}))
@@ -15,13 +12,6 @@
 
 (def ship-types [ "carrier" "battleship" "cruiser" "submarine" "destroyer" ])
 (def ship-sizes (zipmap ship-types [5 4 3 3 2]))
-
-(defn add-help []
-  (dom/append! (dom/by-id "cruiser-h")
-               (h/html [:div.help "Drag to place"])))
-
-(defn remove-help []
-  (dom/destroy! (dom/by-class "help")))
 
 (defn deploy-td-coll []
   (filter (fn [x] (> (count (.-id x)) 0))
@@ -51,13 +41,13 @@
 (defn number-set []
   (singleton-string-set "0123456789"))
 
-(defn coord-from-id [id-str]
+(defn coord-from-table-cell-id [id-str]
   (let [coord-chars    (singleton-string-set "ABCDEFGHIJ0123456789")
         is-coord-char? (fn [c] (contains? coord-chars c))]
     (apply str (filter is-coord-char? id-str))))
 
 (defn coord-of-elem [elem]
-  (coord-from-id (.-id elem)))
+  (coord-from-table-cell-id (aget elem "id")))
 
 (defn midpoint [elem]
   (let [jqo      ($ elem)
@@ -151,6 +141,19 @@
               (js-obj "grid"  (array 28 28)
                       "start" start-ship-drag
                       "stop"  stop-ship-drag)))
+
+(defn encode-query-string [hash-map]
+  )
+
+(defn start-game! []
+  ; (optionally) validate board
+  ; Serialize current board status
+  ; Create computer board
+  ; Submit to route
+  (let [player (board/create-player {} (calc-ship-map))
+        computer (board/create-player {} (board/rand-ships))]
+    (get "/startgame" (encode-query-string {:p1 player
+                                            :p2 computer}))))
 
 (defn ^:export init []
   (do

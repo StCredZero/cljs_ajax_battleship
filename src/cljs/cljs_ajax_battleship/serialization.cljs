@@ -1,6 +1,6 @@
 (ns cljs_ajax_battleship.serialization
-  (:require [clojure.set :as sets]))
-;; (in-ns 'cljs_ajax_battleship.serialization)
+  (:require [clojure.set :as sets]
+            [goog.crypt :as crypt]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Definitions
@@ -10,10 +10,13 @@
 
 (defn abs [x] (if (neg? x) (- x) x))
 
+(def ship-types [ "carrier" "battleship" "cruiser" "submarine" "destroyer" ])
+(def ship-sizes (zipmap ship-types [5 4 3 3 2]))
+
+(def start-ship-count (apply + (vals ship-sizes)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Definitions - Coordinates
-
 
 (defn legal-coord? [c0]
   (and (string? c0)
@@ -117,23 +120,20 @@
 
 
 (defn boolarray->coords
-  ;; ^{:doc "Takes all-coordinates representing all
-  ;; possible coordinates on a battleship map, and an array of boolean
-  ;; values and converts them into a set off coordinates. The array (like
-  ;; a little-endian bit array) represents a battleship map where a true
-  ;; value at an index indicates a presence, false indicates an absence."
-  ;;   :pre [(sequential? present-coordinates)
-  ;;         (every? (fn [item]
-  ;;                   (or (= false item)
-  ;;                       (= true item))) present-coordinates)]
-  ;;   :post [(set? %)]}
+  ^{:doc "Takes all-coordinates representing all
+  possible coordinates on a battleship map, and an array of boolean
+  values and converts them into a set off coordinates. The array (like
+  a little-endian bit array) represents a battleship map where a true
+  value at an index indicates a presence, false indicates an absence."
+    :pre [(sequential? present-coordinates)
+          (every? (fn [item]
+                    (or (= false item)
+                        (= true item))) present-coordinates)]
+    :post [(set? %)]}
   [all-coordinates present-coordinates]
-
   ; Mapping and filtering out nils
-  (->> (map (fn [coordinate present?]
-             (when present? coordinate)) all-coordinates present-coordinates)
-      (filter identity)
-      set))
+  (set (for [[coordinate present?] (map vector coordinates is-present) :when present?]
+         coordinate)))
 
 (defn hex->int [string]
   (js/parseInt string 16))
@@ -154,27 +154,10 @@
    "c" [false false true  true ]
    "d" [true  false true  true ]
    "e" [false true  true  true ]
-   "f" [true  true  true  true ]
-   })
+   "f" [true  true  true  true ]})
 
 (def boolarray->hex-map
-  { [false false false false] "0"
-    [true  false false false] "1"
-    [false true  false false] "2"
-    [true  true  false false] "3"
-    [false false true  false] "4"
-    [true  false true  false] "5"
-    [false true  true  false] "6"
-    [true  true  true  false] "7"
-    [false false false true ] "8"
-    [true  false false true ] "9"
-    [false true  false true ] "a"
-    [true  true  false true ] "b"
-    [false false true  true ] "c"
-    [true  false true  true ] "d"
-    [false true  true  true ] "e"
-    [true  true  true  true ] "f"
-   })
+  (sets/map-invert hex->boolarray-map))
 
 (defn hex->boolarray [hex-str]
   (if (= 1 (count hex-str))
@@ -207,76 +190,71 @@
   (map (fn [c0] (contains? impacts-map c0)) all-shots))
 
 (defn hexstring->coords [s]
-  (let [boolarray (hex->boolarray s)
-        _         (println boolarray)
-        _  (println (sequential? boolarray))]
+  (let [boolarray (hex->boolarray s)]
     (boolarray->coords all-shots boolarray)))
         
 (defn coords->hexstring [coords]
-  (let [boolarray (mapv (fn [c0] (contains? coords c0)) all-shots)]
-    (boolarray->hex boolarray)))    
+  (let [coords-set (set coords)
+        boolarray  (mapv (fn [c0] (contains? coords-set c0)) all-shots)]
+    (boolarray->hex boolarray)))
 
-(defn byte->ship [x ship-type]
+(defn coords-until [pred? offset-f c0]
+  {:pre [(legal-coord? c0)]}
+  (if (pred? c0)
+    '()
+    (let [new-c0 (offset-f c0)]
+      (if (legal-coord? new-c0)
+        (cons c0 (coords-until pred? offset-f new-c0))
+        (cons c0 '())))))
+
+(defn byte->ship [coord-index ship-type]
   {:pre [(contains? ship-sizes ship-type)
-         (>= x 0)]}
-  (let [direction (if (>= x 128) offset-down offset-right)
-        idx       (if (= direction offset-down) (- x 128) x)
+         (>= coord-index 0)]}
+  (let [direction (if (>= coord-index 128) offset-down offset-right)
+        idx       (if (= direction offset-down) (- coord-index 128) coord-index)
         c0        (index->coord (mod idx 100))
         ship-len  (ship-sizes ship-type)
-        pred?     (fn [c1] (>= (coord-distance c0 c1) ship-len))
-        coords    (coords-until pred? direction c0)]
+        dist-gt?  (fn [c1] (>= (coord-distance c0 c1) ship-len))
+        coords    (coords-until dist-gt? direction c0)]
     (zipmap coords (repeat ship-type))))
 
-;; (defn ship->byte [ship-map ship-type]
-;;   (let [has-ship-type? (fn [k] (= ship-type (ship-map k)))
-;;         coords         (filter has-ship-type? (keys ship-map))
-;;         raw-idx        (coord->index (first (sort-by coord->index coords)))]
-;;     (if (coords-covertical? coords) (+ 128 raw-idx) raw-idx)))
+(defn ship->byte [ship-map ship-type]
+  (let [has-ship-type? (fn [k] (= ship-type (ship-map k)))
+        coords         (filter has-ship-type? (keys ship-map))
+        raw-idx        (coord->index (first (sort-by coord->index coords)))]
+    (if (coords-covertical? coords) (+ 128 raw-idx) raw-idx)))
 
-;; (defn ship->string [ship-map ship-type]
-;;   (format "%02x" (ship->byte ship-map ship-type)))
+(defn ship->string [ship-map ship-type]
+  {:pre [(= (set (vals ship-map)) (set ship-types))]}
+  (crypt/byteArrayToHex (array (ship->byte ship-map ship-type))))
 
-;; (defn player->string [player-data]
-;;   (let [ships      (:ships player-data)
-;;         impacts    (:impacts player-data)
-;;         f          (fn [ship-type] (ship->string ships ship-type))
-;;         ships-str  (apply str (map f ship-types))
-;;         coords-str (coords->hexstring (set (keys impacts)))]
-;;     (str ships-str coords-str)))
+(defn valid-player-string? [player-str]
+  (let [hexchr? (fn [c] (contains? (set "0123456789abcdefABCDEF") c))]
+    (and (string? player-str)
+         (>= (count player-str) 12)
+         (every? hexchr? (seq player-str)))))
 
-;; (defn string->ships [player-str]
-;;   (let [format  (partition 2 1 (range 0 12 2))
-;;         f       (fn [idxs] (hex->int (apply subs (cons player-str idxs))))
-;;         n->ship (fn [x] (byte->ship (first x) (last x)))]
-;;     (apply conj (map n->ship (zipmap (map f format) ship-types)))))
+(defn player->string [player-data]
+  (let [{:keys [ships impacts]} player-data
+        f          (fn [ship-type] (ship->string ships ship-type))
+        ships-str  (apply str (map f ship-types))
+        coords-str (coords->hexstring (set (keys impacts)))]
+    (str ships-str coords-str)))
 
-;; (defn string->impacts [ships player-str]
-;;   (let [impactf (fn [c0] {c0 (if (contains? ships c0) "hit" "miss")})
-;;         imp-str (subs player-str 10)
-;;         coords  (map impactf (hexstring->coords imp-str))]
-;;     (if (empty? coords)
-;;       {}
-;;       (apply conj (cons {} coords)))))
+(defn string->ships [player-str]
+  (let [format  (partition 2 1 (range 0 12 2))
+        f       (fn [idxs] (hex->int (apply subs (cons player-str idxs))))
+        n->ship (fn [x] (byte->ship (first x) (last x)))]
+    (apply conj (map n->ship (zipmap (map f format) ship-types)))))
 
-;; (defn string->impacts2 [ships player-str]
-;;   (let [impacts-hexstr    (subs player-str 10)
-;;         impacts-boolarray (hex->boolarray impacts-hexstr)]
-;;     (boolarray->impacts ships impacts-boolarray)))
+(defn string->impacts [ships player-str]
+  {:pre [(valid-player-string? player-str)]}
+  (let [impacts-hexstr    (subs player-str 10)
+        impacts-boolarray (hex->boolarray impacts-hexstr)]
+    (boolarray->impacts ships impacts-boolarray)))
 
-;; (defn string->player [player-str]
-;;   (let [ships   (string->ships player-str)
-;;         impacts (string->impacts ships player-str)]
-;;     (create-player impacts ships)))
-
-;; (defn string->player2 [player-str]
-;;   (let [ships   (string->ships player-str)
-;;         impacts (string->impacts2 ships player-str)]
-;;     (create-player impacts ships)))
-
-;; (defn valid-player-string? [player-str]
-;;   (let [hexchr? (fn [c] (contains? (set "0123456789abcdefABCDEF") c))]
-;;     (and (string? player-str)
-;;          (>= (count player-str) 12)
-;;          (every? hexchr? (seq player-str)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn string->player [player-str]
+  (let [ships   (string->ships player-str)
+        impacts (string->impacts ships player-str)]
+    {:impacts impacts
+     :ships   ships}))
