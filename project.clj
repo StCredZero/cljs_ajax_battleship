@@ -34,12 +34,12 @@
   :cljsbuild {:builds
               {
                :dev
-               {:source-paths ["src/brepl" "src/cljs"]
+               {:source-paths ["src/cljs"]
                 :compiler {:output-to "resources/public/js/cljs_ajax_battleship_dbg.js"
                            :optimizations :whitespace
                            :pretty-print true}}
                :pre-prod
-               {:source-paths ["src/brepl" "src/cljs"]
+               {:source-paths ["src/cljs"]
                 :compiler {:output-to "resources/public/js/cljs_ajax_battleship_pre.js"
                            :optimizations :simple
                            :pretty-print false}}
